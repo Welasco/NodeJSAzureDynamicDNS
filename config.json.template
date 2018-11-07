@@ -1,0 +1,29 @@
+{
+  "updateinterval": 1,
+  "CheckPublicIPProvider": "checkip.amazonaws.com",
+  "PublicIPAddress": "",
+  "AzureAccountDetails": {
+    "AzureSubscriptionID": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "AzureResourceGroup": "RSGName",
+    "AzureDNSZone": "contoso.com",
+    "AzureDNSRecord": "home"
+  },
+  "ServicePrincipal": {
+    "authorityHostUrl": "https://login.windows.net",
+    "tenant": "contoso.onmicrosoft.com",
+    "applicationId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "clientSecret": "ApplicationIDPassword",
+    "resource": "https://management.core.windows.net/",
+    "AzureARMAPIURI": "management.azure.com",
+    "token": {
+      "tokenType": "",
+      "expiresIn": 0,
+      "expiresOn": "",
+      "resource": "",
+      "accessToken": "",
+      "isMRRT": true,
+      "_clientId": "",
+      "_authority": ""
+    }
+  }
+}
