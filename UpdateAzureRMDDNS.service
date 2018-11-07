@@ -1,0 +1,15 @@
+[Unit]
+Description=UpdateAzureRMDDNS
+After=network.target
+
+[Service]
+ExecStart=/opt/NodeJSAzureDynamicDNS/UpdateDNSRecordSet.js
+Restart=always
+User=pi
+Group=pi
+Environment=PATH=/usr/bin:/usr/local/bin
+Environment=NODE_ENV=production
+WorkingDirectory=/opt/NodeJSAzureDynamicDNS
+
+[Install]
+WantedBy=multi-user.target
