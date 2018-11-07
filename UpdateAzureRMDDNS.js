@@ -30,6 +30,7 @@ turnOnLogging()
 
 // Loading Update Interval
 var updateinterval = nconf.get('updateinterval');
+log.debug('UpdateInterval loaded: ' + updateinterval);
 
 // Checking if the Public IP Address was changed
 function UpdatePublicIP(){
@@ -37,13 +38,16 @@ function UpdatePublicIP(){
     var oldPublicIP = nconf.get('PublicIPAddress');
     httprequest.Get(PublicIPProvider,'/',function (returnip) {
         let newip = returnip.trim();
-        log.info('OldIP: ' + oldPublicIP);
-        log.info('newIP: ' + newip);
+        log.debug('OldIP: ' + oldPublicIP);
+        log.debug('newIP: ' + newip);
         if (oldPublicIP != newip) {
+            log.info('Public IP changed: ' + newip);
             nconf.set('PublicIPAddress', newip);
             nconf.save();
-            log.info('NewIP saved! IP: ' + newip);  
+            log.debug('New Public IP saved!');
             // Call Update Azure DNS Record
+
+            log.debug('Loading config.json settings to build Azure URL');
             var AzureARMURI = nconf.get('ServicePrincipal:AzureARMAPIURI');
             dnsrecord.properties.ARecords[0].ipv4Address = newip;
             //dnsrecord.ARecord.properties.ARecords[0].ipv4Address = newip;
@@ -53,14 +57,18 @@ function UpdatePublicIP(){
             let AzureDNSZone = nconf.get('AzureAccountDetails:AzureDNSZone');
             let AzureDNSRecord = nconf.get('AzureAccountDetails:AzureDNSRecord');
             let AzureARMDNSUrl = "/subscriptions/" + AzureSubscriptionID + "/resourceGroups/" + AzureResourceGroup + "/providers/Microsoft.Network/dnsZones/" + AzureDNSZone + "/A/" + AzureDNSRecord + "?api-version=2018-03-01-preview"
+            log.debug('AzureARMURI: ' + AzureARMURI);
+            log.debug('AzureARMDNSUrl: ' + AzureARMDNSUrl);
+            log.debug('DNSRecord: ' + JSON.stringify(dnsrecord));
             httprequest.Post(AzureARMURI,AzureARMDNSUrl,dnsrecord);
             //httprequest.Post('VSANTANA-SURFAC','/api/jsonpost',dnsrecord);
         } else {
-            log.info('Doing nothing since the PublicIP was not changed');
+            log.info('Public IP not changed since last check: ' + oldPublicIP);
         }
     });
 }
 
+log.info('Starting UpdateAzureRMDDNS Loop');
 interval = setInterval(function () {
     UpdatePublicIP()
 }, updateinterval);

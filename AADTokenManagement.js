@@ -26,7 +26,7 @@ function GetToken(callback) {
             return callback(jsontokenparse.accessToken);
         }
     }
-
+    
     var expiresOn = new Date(nconf.get('ServicePrincipal:token:expiresOn'));
     var currentDate = new Date();
     if (expiresOn < currentDate) {
