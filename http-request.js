@@ -33,7 +33,7 @@ function Post(host,url,body) {
                 'Content-Length': Buffer.byteLength(post_data)
             }
         };
-        log.debug('Post_options: ' + post_options);
+        log.debug('Post_options: ' + JSON.stringify(post_options));
         log.debug('Post_Body: ' + post_data);
         process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
         // Set up the request
@@ -67,7 +67,7 @@ function Get(host,url,callback) {
         }
     };
 
-    log.debug('GET_options: ' + post_options);
+    log.debug('GET_options: ' + JSON.stringify(get_options));
     // Set up the request
     var get_req = http.request(get_options, function(res) {
         res.setEncoding('utf8');

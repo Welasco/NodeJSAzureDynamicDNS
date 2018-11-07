@@ -28,9 +28,9 @@ function turnOnLogging() {
 turnOnLogging() 
 */
 
-// Loading Update Interval
-var updateinterval = nconf.get('updateinterval');
-log.debug('UpdateInterval loaded: ' + updateinterval);
+// Loading Update Interval in Minutes
+var updateinterval = nconf.get('updateinterval')*60000;
+log.debug('UpdateInterval loaded: ' + updateinterval + " Milliseconds");
 
 // Checking if the Public IP Address was changed
 function UpdatePublicIP(){
