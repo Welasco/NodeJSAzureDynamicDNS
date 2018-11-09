@@ -1,0 +1,32 @@
+{
+  "updateinterval": 1,
+  "CheckPublicIPProviders": [
+    "checkip-ipip.amazonaws.com",
+    "checkip.amazonaws.com"
+  ],
+  "PublicIPAddress": "76.187.66.64",
+  "AzureAccountDetails": {
+    "AzureSubscriptionID": "d3a942c2-e14d-40a7-9727-d5d70b91d05c",
+    "AzureResourceGroup": "ExternalDNS",
+    "AzureDNSZone": "hepoca.com",
+    "AzureDNSRecord": "victorcasa"
+  },
+  "ServicePrincipal": {
+    "authorityHostUrl": "https://login.windows.net",
+    "tenant": "victorhepoca.onmicrosoft.com",
+    "applicationId": "ecae79c9-b0b1-4ddf-bfbe-8518421bcfb8",
+    "clientSecret": "-&cO@}@ZRMRO&O%%D)HB)EufZ{b@d17;Bi/k|u+}]U?7a%|+)uJ",
+    "resource": "https://management.core.windows.net/",
+    "AzureARMAPIURI": "management.azure.com",
+    "token": {
+      "tokenType": "Bearer",
+      "expiresIn": 3599,
+      "expiresOn": "2018-11-07T05:35:35.582Z",
+      "resource": "https://management.core.windows.net/",
+      "accessToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IndVTG1ZZnNxZFF1V3RWXy1oeFZ0REpKWk00USIsImtpZCI6IndVTG1ZZnNxZFF1V3RWXy1oeFZ0REpKWk00USJ9.eyJhdWQiOiJodHRwczovL21hbmFnZW1lbnQuY29yZS53aW5kb3dzLm5ldC8iLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC80MzdlNDk1YS1lYjNmLTRiZTUtYThmZS05YTAzMDI4OTJmODIvIiwiaWF0IjoxNTQxNTY1MDM3LCJuYmYiOjE1NDE1NjUwMzcsImV4cCI6MTU0MTU2ODkzNywiYWlvIjoiNDJSZ1lHQkpmTFVrTW1mblpnRnJobDhsVGhzMEFRPT0iLCJhcHBpZCI6ImVjYWU3OWM5LWIwYjEtNGRkZi1iZmJlLTg1MTg0MjFiY2ZiOCIsImFwcGlkYWNyIjoiMSIsImVfZXhwIjoyNjI4MDAsImlkcCI6Imh0dHBzOi8vc3RzLndpbmRvd3MubmV0LzQzN2U0OTVhLWViM2YtNGJlNS1hOGZlLTlhMDMwMjg5MmY4Mi8iLCJvaWQiOiI3YTY4YmIwMy03YzY1LTQzM2EtOWEzNS0yZGU3ZTU5M2ExZDQiLCJzdWIiOiI3YTY4YmIwMy03YzY1LTQzM2EtOWEzNS0yZGU3ZTU5M2ExZDQiLCJ0aWQiOiI0MzdlNDk1YS1lYjNmLTRiZTUtYThmZS05YTAzMDI4OTJmODIiLCJ1dGkiOiJsM0NLOWxuQzVrRzJoT05DWHJoQkFBIiwidmVyIjoiMS4wIn0.HN8QEslg69AOTlDHq88k7eb3WSOizsGAdq1mbX76zQXKplmNNneq2MM0LhW4rWxHq-_x_NXGNJlTxt5_yt5V2iCrmMlkuYBDq5mKF5vBn5Am3k3j4nIizGLUOxPFuCZLEtTmlzphLc1MxDaNMQeeILFwhwMWS4WPTRk7ue65Ai1gc-OTxhPgDwlHC6VtTyPa2UbsE8YHNPsF7TVV77gOtxdx9SW_eMfW_crJi9LciGtI1cqu_pWLudNiXrkjxBRboyYvftVrNuOGOLI4uZBvCikPB3PHnwU-6tfqGwLwMzep_kqotbozrIAjTZPBY6qY_KQce5YUd94Kbe0mcwFsAg",
+      "isMRRT": true,
+      "_clientId": "ecae79c9-b0b1-4ddf-bfbe-8518421bcfb8",
+      "_authority": "https://login.windows.net/victorhepoca.onmicrosoft.com"
+    }
+  }
+}
