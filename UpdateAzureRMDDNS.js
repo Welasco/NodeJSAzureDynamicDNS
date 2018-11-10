@@ -7,68 +7,65 @@
 var nconf = require('nconf');
 var dnsrecord = require('./UpdateDNSRecordSet');
 var httprequest = require('./http-request');
+var isIP = require('is-ip');
 var log = require('./logger');
 
 nconf.file({ file: './config.json' });
 
-/*
-function turnOnLogging() {
-    var log = adal.Logging;
-    log.setLoggingOptions(
-    {
-      level : log.LOGGING_LEVEL.VERBOSE,
-      log : function(level, message, error) {
-        console.log(message);
-        if (error) {
-          console.log(error);
-        }
-      }
-    });
-  }
-turnOnLogging() 
-*/
-
 // Loading Update Interval in Minutes
 var updateinterval = nconf.get('updateinterval')*60000;
-log.debug('UpdateInterval loaded: ' + updateinterval + " Milliseconds");
+log.info('UpdateInterval loaded: ' + updateinterval/60000 + " Seconds");
 
 // Checking if the Public IP Address was changed
 function UpdatePublicIP(){
-    var PublicIPProvider = nconf.get('CheckPublicIPProvider');
+    var PublicIPProviders = nconf.get('CheckPublicIPProviders');
     var oldPublicIP = nconf.get('PublicIPAddress');
-    httprequest.Get(PublicIPProvider,'/',function (returnip) {
-        let newip = returnip.trim();
-        log.debug('OldIP: ' + oldPublicIP);
-        log.debug('newIP: ' + newip);
-        if (oldPublicIP != newip) {
-            log.info('Public IP changed: ' + newip);
-            nconf.set('PublicIPAddress', newip);
-            nconf.save();
-            log.debug('New Public IP saved!');
-            // Call Update Azure DNS Record
 
-            log.debug('Loading config.json settings to build Azure URL');
-            var AzureARMURI = nconf.get('ServicePrincipal:AzureARMAPIURI');
-            dnsrecord.properties.ARecords[0].ipv4Address = newip;
-            //dnsrecord.ARecord.properties.ARecords[0].ipv4Address = newip;
-            
-            let AzureSubscriptionID = nconf.get('AzureAccountDetails:AzureSubscriptionID');
-            let AzureResourceGroup = nconf.get('AzureAccountDetails:AzureResourceGroup');
-            let AzureDNSZone = nconf.get('AzureAccountDetails:AzureDNSZone');
-            let AzureDNSRecord = nconf.get('AzureAccountDetails:AzureDNSRecord');
-            let AzureARMDNSUrl = "/subscriptions/" + AzureSubscriptionID + "/resourceGroups/" + AzureResourceGroup + "/providers/Microsoft.Network/dnsZones/" + AzureDNSZone + "/A/" + AzureDNSRecord + "?api-version=2018-03-01-preview"
-            log.debug('AzureARMURI: ' + AzureARMURI);
-            log.debug('AzureARMDNSUrl: ' + AzureARMDNSUrl);
-            log.debug('DNSRecord: ' + JSON.stringify(dnsrecord));
-            httprequest.Post(AzureARMURI,AzureARMDNSUrl,dnsrecord);
-            //httprequest.Post('VSANTANA-SURFAC','/api/jsonpost',dnsrecord);
-        } else {
-            log.info('Public IP not changed since last check: ' + oldPublicIP);
+    for (let index = 0; index < PublicIPProviders.length; index++) {
+        const PublicIPProvider = PublicIPProviders[index];
+        log.info('Cheking PublicIPProvider: ' + PublicIPProvider);
+        try {
+            var returnip = httprequest.Get(PublicIPProvider);
+            let newip = returnip.trim();
+            if (isIP(newip)) {
+                log.debug('OldIP: ' + oldPublicIP);
+                log.debug('newIP: ' + newip);    
+                if (oldPublicIP != newip) {
+                    log.info('Public IP changed: ' + newip);
+                    nconf.set('PublicIPAddress', newip);
+                    nconf.save();
+                    log.debug('New Public IP saved!');
+                    // Call Update Azure DNS Record
+                    log.info('Loading config.json settings to build Azure URL');
+                    var AzureARMURI = nconf.get('ServicePrincipal:AzureARMAPIURI');
+                    dnsrecord.properties.ARecords[0].ipv4Address = newip;
+                    
+                    let AzureSubscriptionID = nconf.get('AzureAccountDetails:AzureSubscriptionID');
+                    let AzureResourceGroup = nconf.get('AzureAccountDetails:AzureResourceGroup');
+                    let AzureDNSZone = nconf.get('AzureAccountDetails:AzureDNSZone');
+                    let AzureDNSRecord = nconf.get('AzureAccountDetails:AzureDNSRecord');
+                    let AzureARMDNSUrl = "/subscriptions/" + AzureSubscriptionID + "/resourceGroups/" + AzureResourceGroup + "/providers/Microsoft.Network/dnsZones/" + AzureDNSZone + "/A/" + AzureDNSRecord + "?api-version=2018-03-01-preview"
+                    log.debug('AzureARMURI: ' + AzureARMURI);
+                    log.debug('AzureARMDNSUrl: ' + AzureARMDNSUrl);
+                    log.debug('DNSRecord: ' + JSON.stringify(dnsrecord));
+                    httprequest.Post(AzureARMURI,AzureARMDNSUrl,dnsrecord);
+                    break;
+                } else {
+                    log.info('Public IP not changed since last check: ' + oldPublicIP);
+                    break;
+                }
+            }
+            else{
+                log.error("PublicIP provider returned an invalid IP Address: " + newip);
+            }
+        } catch (error) {
+            log.error('Unable to get the external IP address from the provider: ' + PublicIPProvider + ' Error: ' + error);
         }
-    });
+    }
 }
 
 log.info('Starting UpdateAzureRMDDNS Loop');
+UpdatePublicIP()
 interval = setInterval(function () {
     UpdatePublicIP()
 }, updateinterval);
