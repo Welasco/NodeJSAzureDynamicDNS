@@ -14,7 +14,7 @@ nconf.file({ file: './config.json' });
 
 // Loading Update Interval in Minutes
 var updateinterval = nconf.get('updateinterval')*60000;
-log.info('UpdateInterval loaded: ' + updateinterval/60000 + " Seconds");
+log.info('UpdateInterval loaded: ' + updateinterval/60000 + " Minutes");
 
 // Checking if the Public IP Address was changed
 function UpdatePublicIP(){

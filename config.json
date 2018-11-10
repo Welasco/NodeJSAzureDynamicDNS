@@ -13,7 +13,7 @@
     "http://ipv4.icanhazip.com/",
     "http://ifconfig.me"
   ],
-  "PublicIPAddress": "",
+  "PublicIPAddress": "76.187.66.64",
   "AzureAccountDetails": {
     "AzureSubscriptionID": "d3a942c2-e14d-40a7-9727-d5d70b91d05c",
     "AzureResourceGroup": "ExternalDNS",
