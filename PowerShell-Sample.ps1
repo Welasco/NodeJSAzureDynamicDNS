@@ -123,3 +123,16 @@ Invoke-RestMethod http://ifconfig.co
 # Curl Only
 #ifconfig.co
 #ifconfig.me
+
+
+"http://ifconfig.co",
+"http://checkip.amazonaws.com/",
+"http://ipecho.net/plain",
+"http://icanhazip.com",
+"http://bot.whatismyipaddress.com",
+"http://ipinfo.io/ip",
+"http://ifconfig.me",
+"https://api.ipify.org",
+"https://ipinfo.io/ip",
+"https://wtfismyip.com/text",
+"https://ipv4.icanhazip.com/"

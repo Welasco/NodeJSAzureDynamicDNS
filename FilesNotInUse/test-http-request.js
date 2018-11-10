@@ -16,5 +16,4 @@ function Get(host,callback) {
         return res.body.toString('utf-8');
     }
 }
-
 module.exports.Get = Get;
