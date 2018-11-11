@@ -1,5 +1,5 @@
 {
-  "updateinterval": 1,
+  "updateinterval": 15,
   "CheckPublicIPProviders": [
     "http://ifconfig.co",
     "http://checkip.amazonaws.com/",
