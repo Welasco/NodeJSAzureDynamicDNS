@@ -13,29 +13,29 @@
     "http://ipv4.icanhazip.com/",
     "http://ifconfig.me"
   ],
-  "PublicIPAddress": "76.187.66.64",
+  "PublicIPAddress": "",
   "AzureAccountDetails": {
-    "AzureSubscriptionID": "d3a942c2-e14d-40a7-9727-d5d70b91d05c",
-    "AzureResourceGroup": "ExternalDNS",
-    "AzureDNSZone": "hepoca.com",
-    "AzureDNSRecord": "victorcasa"
+    "AzureSubscriptionID": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "AzureResourceGroup": "ResourceGroup",
+    "AzureDNSZone": "company.com",
+    "AzureDNSRecord": "www"
   },
   "ServicePrincipal": {
     "authorityHostUrl": "https://login.windows.net",
-    "tenant": "victorhepoca.onmicrosoft.com",
-    "applicationId": "ecae79c9-b0b1-4ddf-bfbe-8518421bcfb8",
-    "clientSecret": "-&cO@}@ZRMRO&O%%D)HB)EufZ{b@d17;Bi/k|u+}]U?7a%|+)uJ",
+    "tenant": "company.onmicrosoft.com",
+    "applicationId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "clientSecret": "password",
     "resource": "https://management.core.windows.net/",
     "AzureARMAPIURI": "management.azure.com",
     "token": {
-      "tokenType": "Bearer",
-      "expiresIn": 3600,
-      "expiresOn": "2018-11-10T17:58:58.402Z",
-      "resource": "https://management.core.windows.net/",
-      "accessToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IndVTG1ZZnNxZFF1V3RWXy1oeFZ0REpKWk00USIsImtpZCI6IndVTG1ZZnNxZFF1V3RWXy1oeFZ0REpKWk00USJ9.eyJhdWQiOiJodHRwczovL21hbmFnZW1lbnQuY29yZS53aW5kb3dzLm5ldC8iLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC80MzdlNDk1YS1lYjNmLTRiZTUtYThmZS05YTAzMDI4OTJmODIvIiwiaWF0IjoxNTQxODY4ODM4LCJuYmYiOjE1NDE4Njg4MzgsImV4cCI6MTU0MTg3MjczOCwiYWlvIjoiNDJSZ1lHQkpmTFVrTW1mblpnRnJobDhsVGhzMEFRPT0iLCJhcHBpZCI6ImVjYWU3OWM5LWIwYjEtNGRkZi1iZmJlLTg1MTg0MjFiY2ZiOCIsImFwcGlkYWNyIjoiMSIsImVfZXhwIjoyNjI4MDAsImlkcCI6Imh0dHBzOi8vc3RzLndpbmRvd3MubmV0LzQzN2U0OTVhLWViM2YtNGJlNS1hOGZlLTlhMDMwMjg5MmY4Mi8iLCJvaWQiOiI3YTY4YmIwMy03YzY1LTQzM2EtOWEzNS0yZGU3ZTU5M2ExZDQiLCJzdWIiOiI3YTY4YmIwMy03YzY1LTQzM2EtOWEzNS0yZGU3ZTU5M2ExZDQiLCJ0aWQiOiI0MzdlNDk1YS1lYjNmLTRiZTUtYThmZS05YTAzMDI4OTJmODIiLCJ1dGkiOiJBRnNIeEFzN0NrS1YwQ2dqVDAwVUFBIiwidmVyIjoiMS4wIn0.WZpBUaFZtJH6Lgn5kxOlPlW0G2YRKHwdikL1bSE30eDHodgF0Cx1fSygbtMcMANIdhU37TeDVlITCHgKCbyFQFwrzT5UoGSmIR90KX1VCLsmCpUuDc8bpNmg_R-Kix1P8XJ50fqsYtugDFjwQMhVB0KjufQXVzBYNLv9PS146jahn0NmEkRes-BcYzlfpKcfDhtJcrdA7n6StrjrofErnKpoaAXmjY48RbvJLXwDzpKA6Rvctcn5Gx0Myha0QH4HOkDaZUk2OkdUfOmESmQKhQrBJr7-XdbJhyfFncXlIfZ7iNgVho8ycfM1BtFb-HFslDNuJlVH6S70Egf9NdOP4w",
+      "tokenType": "",
+      "expiresIn": 0,
+      "expiresOn": "",
+      "resource": "",
+      "accessToken": "",
       "isMRRT": true,
-      "_clientId": "ecae79c9-b0b1-4ddf-bfbe-8518421bcfb8",
-      "_authority": "https://login.windows.net/victorhepoca.onmicrosoft.com"
+      "_clientId": "",
+      "_authority": ""
     }
   }
 }

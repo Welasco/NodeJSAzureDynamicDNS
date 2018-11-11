@@ -28,6 +28,7 @@ install (){
     mv /opt/NodeJSAzureDynamicDNS-master/ $INSTALL_DIR
     chmod +755 $INSTALL_DIR/UpdateAzureRMDDNS.js
     cd $INSTALL_DIR
+    echo "Installing NPM Modules"
     npm install > /dev/null 2>&1
     cp $INSTALL_DIR/UpdateAzureRMDDNS.service /lib/systemd/system
     systemctl daemon-reload

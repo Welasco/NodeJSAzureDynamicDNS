@@ -1,18 +1,30 @@
 {
   "updateinterval": 1,
-  "CheckPublicIPProvider": "checkip.amazonaws.com",
+  "CheckPublicIPProviders": [
+    "http://ifconfig.co",
+    "http://checkip.amazonaws.com/",
+    "http://ipecho.net/plain",
+    "http://icanhazip.com",
+    "http://bot.whatismyipaddress.com",
+    "http://ipinfo.io/ip",
+    "http://api.ipify.org",
+    "http://ipinfo.io/ip",
+    "http://wtfismyip.com/text",
+    "http://ipv4.icanhazip.com/",
+    "http://ifconfig.me"
+  ],
   "PublicIPAddress": "",
   "AzureAccountDetails": {
     "AzureSubscriptionID": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-    "AzureResourceGroup": "RSGName",
-    "AzureDNSZone": "contoso.com",
-    "AzureDNSRecord": "home"
+    "AzureResourceGroup": "ResourceGroup",
+    "AzureDNSZone": "company.com",
+    "AzureDNSRecord": "www"
   },
   "ServicePrincipal": {
     "authorityHostUrl": "https://login.windows.net",
-    "tenant": "contoso.onmicrosoft.com",
+    "tenant": "company.onmicrosoft.com",
     "applicationId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-    "clientSecret": "ApplicationIDPassword",
+    "clientSecret": "password",
     "resource": "https://management.core.windows.net/",
     "AzureARMAPIURI": "management.azure.com",
     "token": {
