@@ -3,7 +3,7 @@ Description=UpdateAzureRMDDNS
 After=network.target
 
 [Service]
-ExecStart=/opt/NodeJSAzureDynamicDNS/UpdateDNSRecordSet.js
+ExecStart=/opt/NodeJSAzureDynamicDNS/UpdateAzureRMDDNS.js
 Restart=always
 User=root
 Group=root
