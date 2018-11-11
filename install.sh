@@ -1,6 +1,8 @@
 #!/bin/bash
 
 # curl -SL https://raw.githubusercontent.com/Welasco/NodeJSAzureDynamicDNS/master/install.sh | sudo -E bash -
+# sudo apt-get purge --auto-remove nodejs
+
 
 INSTALL_DIR=/opt/NodeJSAzureDynamicDNS
 
