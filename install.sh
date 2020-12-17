@@ -45,9 +45,11 @@ install (){
 if ! [ -x "$(command -v node)" ]; then
   if $(uname -m | grep -Eq ^armv6); then
     echo "ARMV6 detected installing node-v11.1.0-linux-armv6l.tar.gz"
-    curl -o node-v11.1.0-linux-armv6l.tar.gz https://nodejs.org/dist/v11.1.0/node-v11.1.0-linux-armv6l.tar.gz
-    tar -xzf node-v11.1.0-linux-armv6l.tar.gz
-    sudo cp -r node-v11.1.0-linux-armv6l/* /usr/local/
+    # reference: https://blog.rodrigograca.com/how-to-install-latest-nodejs-on-raspberry-pi-0-w/
+    # https://unofficial-builds.nodejs.org/download/release/v14.15.2/node-v14.15.2-linux-armv6l.tar.xz
+    curl -o node-v14.15.2-linux-armv6l.tar.xz https://unofficial-builds.nodejs.org/download/release/v14.15.2/node-v14.15.2-linux-armv6l.tar.xz
+    tar -xzf node-v14.15.2-linux-armv6l.tar.xz
+    sudo cp -r node-v14.15.2-linux-armv6l/* /usr/local/
 
   else
     echo "NodeJS Not found"
