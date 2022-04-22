@@ -6,7 +6,7 @@
     "start": "node UpdateAzureRMDDNS.js"
   },
   "dependencies": {
-    "nconf": "^0.10.0",
+    "nconf": "^0.11.4",
     "os": "^0.1.1",
     "adal-node": "^0.1.28",
     "winston": "^3.1.0",
