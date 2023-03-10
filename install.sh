@@ -54,7 +54,7 @@ if ! [ -x "$(command -v node)" ]; then
   else
     echo "NodeJS Not found"
     echo "Installing NodeJS"
-    curl -sL https://deb.nodesource.com/setup_11.x | sudo -E bash -
+    curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
     sudo apt-get install -y nodejs  
   fi
   install
