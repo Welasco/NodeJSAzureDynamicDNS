@@ -1,9 +1,15 @@
 {
   "updateinterval": 15,
   "CheckPublicIPProviders": [
-    "https://api4.ipify.org",
-    "https://ipv4.icanhazip.com/",
-    "https://checkip.amazonaws.com/"
+    "http://ifconfig.co",
+    "http://checkip.amazonaws.com/",
+    "http://ipecho.net/plain",
+    "http://icanhazip.com",
+    "http://ipinfo.io/ip",
+    "http://api.ipify.org",
+    "http://wtfismyip.com/text",
+    "http://ipv4.icanhazip.com/",
+    "http://ifconfig.me"
   ],
   "PublicIPAddress": "",
   "AzureAccountDetails": {

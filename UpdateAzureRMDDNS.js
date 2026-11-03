@@ -18,12 +18,12 @@ function validateConfiguration(config) {
 
     const providers = config.get('CheckPublicIPProviders');
     if (!Array.isArray(providers) || providers.length === 0) {
-        throw new Error('CheckPublicIPProviders must contain at least one HTTPS URL');
+        throw new Error('CheckPublicIPProviders must contain at least one HTTP or HTTPS URL');
     }
     for (const provider of providers) {
         const url = typeof provider === 'string' ? new URL(provider) : null;
-        if (!url || url.protocol !== 'https:' || url.username || url.password) {
-            throw new Error('CheckPublicIPProviders must contain HTTPS URLs without embedded credentials');
+        if (!url || !['http:', 'https:'].includes(url.protocol) || url.username || url.password) {
+            throw new Error('CheckPublicIPProviders must contain HTTP or HTTPS URLs without embedded credentials');
         }
     }
 

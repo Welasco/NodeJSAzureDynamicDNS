@@ -96,7 +96,13 @@ test('fails explicitly without changing DNS when all IPv4 providers fail', async
     assert.equal(JSON.parse(fs.readFileSync(file)).PublicIPAddress, '192.0.2.1');
 });
 
-test('rejects invalid intervals, insecure providers, missing settings and legacy credentials', () => {
+test('accepts a mix of HTTP and HTTPS providers', t => {
+    const { config } = fixture(t);
+    config.set('CheckPublicIPProviders', ['http://example.com/ip', 'https://example.com/ip']);
+    assert.doesNotThrow(() => validateConfiguration(config));
+});
+
+test('rejects invalid intervals, unsupported providers, missing settings and legacy credentials', () => {
     const cases = [
         ['updateinterval', 0, /updateinterval/],
         ['updateinterval', -1, /updateinterval/],
@@ -104,7 +110,7 @@ test('rejects invalid intervals, insecure providers, missing settings and legacy
         ['updateinterval', Infinity, /updateinterval/],
         ['updateinterval', 40_000, /timer range/],
         ['CheckPublicIPProviders', [], /at least one/],
-        ['CheckPublicIPProviders', ['http://example.com'], /HTTPS/],
+        ['CheckPublicIPProviders', ['ftp://example.com'], /HTTP or HTTPS/],
         ['CheckPublicIPProviders', ['https://user:password@example.com'], /embedded credentials/],
         ['AzureAccountDetails:AzureResourceGroup', '', /AzureResourceGroup/],
         ['Authentication:method', 'unknown', /Authentication.method/],

@@ -7,7 +7,7 @@ Uses Azure Identity and the Azure DNS management SDK; no ADAL or manual token ca
 
 - Node.js **22, 24 or 26 LTS** and npm.
 - An Azure DNS zone and an identity with **DNS Zone Contributor** assigned at the zone scope.
-- Outbound HTTPS access to Microsoft Entra ID, Azure Resource Manager and the configured public-IP providers.
+- Outbound HTTPS access to Microsoft Entra ID and Azure Resource Manager, plus IPv4 HTTP/HTTPS access to the configured public-IP providers.
 
 **Raspberry Pi Zero W (ARMv6):** the installer uses exactly
 [Node.js 22.23.4 for linux-armv6l](https://unofficial-builds.nodejs.org/download/release/v22.23.4/node-v22.23.4-linux-armv6l.tar.xz)
@@ -114,7 +114,10 @@ Edit `config.json`, using `config-template.json` as the starting point:
 the zone apex). The app manages a single IPv4 address with a TTL of 3600 seconds;
 it replaces the selected A record set's contents.
 
-Providers must return plain-text IPv4 addresses over HTTPS without redirects.
+Providers must return plain-text IPv4 addresses over HTTP or HTTPS without redirects.
+Provider connections use IPv4 only (equivalent to `curl -4`), so dual-stack
+providers see your public IPv4 address rather than IPv6. HTTPS is recommended:
+HTTP responses can be altered in transit and cause an incorrect DNS update.
 Each provider and DNS operation has a 30-second timeout. Providers are tried in
 order; IPv6 or invalid responses trigger the next provider. A failed DNS update
 is retried on the next polling cycle without marking the IP as successfully saved.
@@ -134,7 +137,7 @@ Or, after exporting credentials, run `npm start` in the checkout.
 
 1. Stop the service and install Node 22/24/26 (use the pinned unofficial ARMv6 build on Pi Zero W).
 2. Update the application files and run `npm ci --omit=dev`.
-3. Keep your existing `AzureAccountDetails` and interval. Replace public-IP providers with the HTTPS examples above.
+3. Keep your existing `AzureAccountDetails` and interval. Check that public-IP providers return plain-text IPv4 without redirects; prefer the HTTPS examples above.
 4. Move tenant ID, application ID and client secret to the environment variables above. Remove the entire legacy `ServicePrincipal` section, including cached tokens, from `config.json`; add `Authentication.method`.
 5. Clear `PublicIPAddress` to `""` to force a confirmed DNS update after migration.
 6. Install the updated service unit as `/etc/systemd/system/UpdateAzureRMDDNS.service`, create the environment file with mode 600, run `sudo systemctl daemon-reload`, then restart the service.
