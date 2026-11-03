@@ -1,147 +1,164 @@
+# NodeJSAzureDynamicDNS
 
-## Register a new application using the Azure portal
+Updates an Azure DNS **A record** when your public IPv4 address changes.
+Uses Azure Identity and the Azure DNS management SDK; no ADAL or manual token cache.
 
-1. Sign in to the [Azure portal](https://portal.azure.com).
-1. If your account gives you access to more than one, select your account in the top right corner, and set your portal session to the desired Azure AD tenant.
-1. In the left-hand navigation pane, select the **Azure Active Directory** service.
-1. Select **App registrations** and then select **New application registration**.
+## Requirements
 
-    ![Register a new application](./images/0.png)
+- Node.js **22, 24 or 26 LTS** and npm.
+- An Azure DNS zone and an identity with **DNS Zone Contributor** assigned at the zone scope.
+- Outbound HTTPS access to Microsoft Entra ID, Azure Resource Manager and the configured public-IP providers.
 
-1. When the **Create** page appears, enter your application's registration information: 
+**Raspberry Pi Zero W (ARMv6):** the installer uses exactly
+[Node.js 22.23.4 for linux-armv6l](https://unofficial-builds.nodejs.org/download/release/v22.23.4/node-v22.23.4-linux-armv6l.tar.xz)
+and checks its SHA-256 against the published manifest. This is an **unofficial** build,
+not an officially supported Node.js hardware target. Use an OS compatible with that build.
+Node 22 LTS support ends April 30, 2027; keeping ARMv6 supported after that requires
+an available compatible build of a supported Node version.
 
-    - **Name:** Enter a meaningful application name like: AzureDDNS
-    - **Application type:**
-      - Select **Web app/API**.
-    - **Sign-On URL:** Use the same name like: https://azureddns 
+## Azure authentication
 
-      ![Register a new application - create](./images/1.png)
+### Service principal (Raspberry Pi or other non-Azure host)
 
-1. When the **Registered app** page appears, take a note of Application ID and click Settings.
+In the Azure portal, open **Microsoft Entra ID > App registrations > New registration**.
+Create a single-tenant app; this background service does not need a redirect URI.
+Record its **Application (client) ID** and **Directory (tenant) ID**.
+Under **Certificates & secrets**, create a client secret and copy its **value**.
+Choose an expiration date and rotate it before it expires.
 
-      ![Registered app](./images/2.png)
+In your DNS zone's **Access control (IAM)**, assign **DNS Zone Contributor**
+to the application's service principal. Existing app registrations and zone-scoped
+role assignments can normally be reused.
 
-1. When the **Settings** page appears, click Keys:
+Keep `"Authentication": { "method": "clientSecret" }` in `config.json` and supply:
 
-    - **Passwords:** Type a name for your Key and select the Expiration time to Never expires then click Save.
-    - **ATTENTION!** Once you save the key it will show the password only once. Copy the key value. You won't be able to retrieve after you leave this blade.
+```sh
+export AZURE_TENANT_ID="your-tenant-id"
+export AZURE_CLIENT_ID="your-application-id"
+export AZURE_CLIENT_SECRET="your-secret-value"
+npm start
+```
 
-    ![Creating Key](./images/3.png)
+For systemd, put these assignments in `/etc/NodeJSAzureDynamicDNS.env` (no `export`):
 
-    ![Saving Key](./images/4.png)
+```ini
+AZURE_TENANT_ID=your-tenant-id
+AZURE_CLIENT_ID=your-application-id
+AZURE_CLIENT_SECRET='your-secret-value'
+```
 
-## Add Azure DNS zone permission to ADD Registered App
+Protect that file with `sudo chmod 600 /etc/NodeJSAzureDynamicDNS.env`.
+The app does not load `.env` files itself; systemd loads the environment file.
+Never put credentials or access tokens in `config.json`.
 
-1. Open your Azure DNS zone and Add the AAD Registered App permission:
+### Managed identity (Azure-hosted deployment)
 
-    Click Access control (IAM).
+Enable a managed identity on the Azure host, grant it the same zone-scoped role,
+and set `"Authentication": { "method": "managedIdentity" }`.
+For a system-assigned identity, no Azure credential environment variables are needed.
+For a user-assigned identity, set `AZURE_CLIENT_ID` to its client ID.
+Managed identity is not available on a standalone Raspberry Pi.
 
-    ![Saving Key](./images/5.png)
+## Linux installation
 
-1. Add the permission as follow:
+The installer requires a Debian-based distribution with apt and systemd.
+It preserves a supported Node 22/24/26 installation on other architectures, otherwise
+installs Node 26 LTS. On ARMv6 it installs the pinned build above if necessary,
+including replacing an older Node installation.
 
-    - Click Add
-    - **Role:** select **DNS Zone Contributor**.
-    - **Select:** Select your Azure AD Application created in the previous step. **You can past the applicationID to find it.**
-    - Select the application and save.
+Download and inspect the installer before running it:
 
-    ![Saving Key](./images/6.png)
+```sh
+curl -fL -o install.sh https://raw.githubusercontent.com/Welasco/NodeJSAzureDynamicDNS/master/install.sh
+sudo bash install.sh
+```
 
-## Installing NodeJSAzureDynamicDNS
+The app is installed at `/opt/NodeJSAzureDynamicDNS`, with dependencies from
+`package-lock.json`. The service is enabled but **not started** until configured.
+The installer refuses to overwrite an existing installation.
 
-1. Using a Linux console:
+For a manual installation from a checkout:
 
-    - **Using Linux Console run:** 
-    
-            curl -SL https://raw.githubusercontent.com/Welasco/NodeJSAzureDynamicDNS/master/install.sh | sudo -E bash -
-    The files will be installed at ****/opt/NodeJSAzureDynamicDNS****.
+```sh
+npm ci
+cp config-template.json config.json
+chmod 600 config.json
+```
 
-## Updating config.json and starting application
+## Configuration and startup
 
-1. Using your prefered text editor open /opt/NodeJSAzureDynamicDNS/config.json:
+Edit `config.json`, using `config-template.json` as the starting point:
 
-        {
-            "updateinterval": 15,
-            "CheckPublicIPProviders": [
-                "http://ifconfig.co",
-                "http://checkip.amazonaws.com/",
-                "http://ipecho.net/plain",
-                "http://icanhazip.com",
-                "http://bot.whatismyipaddress.com",
-                "http://ipinfo.io/ip",
-                "http://api.ipify.org",
-                "http://ipinfo.io/ip",
-                "http://wtfismyip.com/text",
-                "http://ipv4.icanhazip.com/",
-                "http://ifconfig.me"
-            ],
-            "PublicIPAddress": "",
-            "AzureAccountDetails": {
-                "AzureSubscriptionID": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-                "AzureResourceGroup": "ResourceGroup",
-                "AzureDNSZone": "company.com",
-                "AzureDNSRecord": "www"
-            },
-            "ServicePrincipal": {
-                "authorityHostUrl": "https://login.windows.net",
-                "tenant": "company.onmicrosoft.com",
-                "applicationId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-                "clientSecret": "password",
-                "resource": "https://management.core.windows.net/",
-                "AzureARMAPIURI": "management.azure.com",
-                "token": {
-                    "tokenType": "",
-                    "expiresIn": 0,
-                    "expiresOn": "2000-11-10T17:58:58.402Z",
-                    "resource": "",
-                    "accessToken": "",
-                    "isMRRT": true,
-                    "_clientId": "",
-                    "_authority": ""
-                }
-            }
-        }    
+```json
+{
+  "updateinterval": 15,
+  "CheckPublicIPProviders": [
+    "https://api4.ipify.org",
+    "https://ipv4.icanhazip.com/",
+    "https://checkip.amazonaws.com/"
+  ],
+  "PublicIPAddress": "",
+  "AzureAccountDetails": {
+    "AzureSubscriptionID": "your-subscription-id",
+    "AzureResourceGroup": "your-resource-group",
+    "AzureDNSZone": "example.com",
+    "AzureDNSRecord": "www"
+  },
+  "Authentication": {
+    "method": "clientSecret"
+  }
+}
+```
 
-1. We need to update the following lines:
+`AzureDNSRecord` is relative to the zone (`www` for `www.example.com`, or `@` for
+the zone apex). The app manages a single IPv4 address with a TTL of 3600 seconds;
+it replaces the selected A record set's contents.
 
-        "AzureSubscriptionID": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-        "AzureResourceGroup": "ResourceGroup"
-        "AzureDNSZone": "company.com"
-        "AzureDNSRecord": "www"     
-        "tenant": "company.onmicrosoft.com",
-        "applicationId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-        "clientSecret": "password"
+Providers must return plain-text IPv4 addresses over HTTPS without redirects.
+Each provider and DNS operation has a 30-second timeout. Providers are tried in
+order; IPv6 or invalid responses trigger the next provider. A failed DNS update
+is retried on the next polling cycle without marking the IP as successfully saved.
 
-    **AzureSubscriptionID:** Is your Azure Subscription ID.
+The first check runs immediately. Subsequent checks run `updateinterval` minutes
+after the previous cycle finishes, so cycles never overlap.
+Configuration changes require a restart.
 
-    **AzureResourceGroup:** Is the Resource Group name where your Azure dns Zones is located.
+```sh
+sudo systemctl start UpdateAzureRMDDNS
+sudo systemctl status UpdateAzureRMDDNS
+```
 
-    **AzureDNSZone:** Is the Azure DNS Zone name.
+Or, after exporting credentials, run `npm start` in the checkout.
 
-    **AzureDNSRecord:** Is your Azure DNS Record name that will be updated.
+## Migrating an existing ADAL installation
 
-    **tenant:** Is your tenant name like contoso.onmicrosoft.com.
+1. Stop the service and install Node 22/24/26 (use the pinned unofficial ARMv6 build on Pi Zero W).
+2. Update the application files and run `npm ci --omit=dev`.
+3. Keep your existing `AzureAccountDetails` and interval. Replace public-IP providers with the HTTPS examples above.
+4. Move tenant ID, application ID and client secret to the environment variables above. Remove the entire legacy `ServicePrincipal` section, including cached tokens, from `config.json`; add `Authentication.method`.
+5. Clear `PublicIPAddress` to `""` to force a confirmed DNS update after migration.
+6. Install the updated service unit as `/etc/systemd/system/UpdateAzureRMDDNS.service`, create the environment file with mode 600, run `sudo systemctl daemon-reload`, then restart the service.
 
-    **applicationId:** Is your Azure AAD Application ID copied at step 6 in "Register a new application using the Azure portal".
+The app deliberately refuses legacy `ServicePrincipal` configuration rather than
+silently retaining secrets or tokens. Existing `config.json` files are not
+automatically rewritten during an upgrade. Do not commit local configuration;
+if a previous checkout already tracks your file, `.gitignore` does not untrack it.
+Old versions logged tokens, so protect or remove those old logs and rotate any
+credentials that were exposed.
 
-    **clientSecret:** Is your Azure AAD Application secret key copied at step 7 in "Register a new application using the Azure portal".
+## Troubleshooting and development
 
-1. Save the settings.
+Logs are written to the console/systemd journal and `UpdateAzureRMDDNS.log` beside
+the app. File logs are retained across restarts and rotated at 5 MiB (up to three files).
+Use `sudo journalctl -u UpdateAzureRMDDNS` for startup failures.
 
-1. Start the service
+For authentication failures, check credential expiry and the tenant/client IDs.
+For HTTP 403, check the zone-scoped role assignment. Never disable TLS verification;
+install the appropriate trusted CA certificates if needed.
 
-        sudo systemctl start UpdateAzureRMDDNS
+Only a successful Azure update advances `PublicIPAddress`. To force another update,
+stop the service, clear that field, then restart.
 
-## Troubleshooting
-
-1. The service will save a log file at:
-        
-        /opt/NodeJSAzureDynamicDNS/UpdateAzureRMDDNS.log
-
-1. Everytime you start the application it will update the current Public IP Address and until it's not changed it won't trygger a new change. In case you would like to trigger a new update just clen the attribute "PublicIPAddress" at config.json like this:
-
-        "PublicIPAddress": "",
-
-1. By default it will check if your PublicIP has changed in a interval of 15 minutes. You can change it at config.json:
-
-        "updateinterval": 15,
+Run the focused automated tests with `npm test` on a supported Node version.
+Tests do not require Azure credentials or modify real DNS records.
+`FilesNotInUse/` contains historical experiments, not supported app entry points.

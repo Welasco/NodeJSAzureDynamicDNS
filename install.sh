@@ -1,66 +1,82 @@
 #!/bin/bash
-
-# curl -SL https://raw.githubusercontent.com/Welasco/NodeJSAzureDynamicDNS/master/install.sh | sudo -E bash -
-# sudo apt-get purge --auto-remove nodejs
-
+set -euo pipefail
 
 INSTALL_DIR=/opt/NodeJSAzureDynamicDNS
+ENV_FILE=/etc/NodeJSAzureDynamicDNS.env
 
-#Step 1) Check if root--------------------------------------
 if [[ $EUID -ne 0 ]]; then
-   echo "Please execute the installation script as root." 
-   exit 1
+    echo "Please execute the installation script as root." >&2
+    exit 1
 fi
-#-----------------------------------------------------------
+if [[ -e "$INSTALL_DIR" ]]; then
+    echo "NodeJSAzureDynamicDNS already installed at $INSTALL_DIR." >&2
+    exit 1
+fi
+
+TEMP_DIR=$(mktemp -d)
+NODE_ARCHIVE=node-v22.23.4-linux-armv6l.tar.xz
+cleanup() {
+    rm -f "$TEMP_DIR/$NODE_ARCHIVE" "$TEMP_DIR/SHASUMS256.txt" \
+        "$TEMP_DIR/app.zip" "$TEMP_DIR/nodesource.sh"
+    rmdir "$TEMP_DIR"
+}
+trap cleanup EXIT
+
+apt-get update
+apt-get install -y ca-certificates curl unzip xz-utils
+
+if [[ $(uname -m) == armv6l ]]; then
+    if ! command -v node >/dev/null 2>&1 ||
+        [[ $(node --version) != v22.23.4 ]] ||
+        ! command -v npm >/dev/null 2>&1; then
+        echo "Installing Node.js 22.23.4 unofficial ARMv6 build for Raspberry Pi Zero W"
+        curl --fail --location --show-error \
+            -o "$TEMP_DIR/$NODE_ARCHIVE" \
+            https://unofficial-builds.nodejs.org/download/release/v22.23.4/node-v22.23.4-linux-armv6l.tar.xz
+        curl --fail --location --show-error \
+            -o "$TEMP_DIR/SHASUMS256.txt" \
+            https://unofficial-builds.nodejs.org/download/release/v22.23.4/SHASUMS256.txt
+        grep "  ${NODE_ARCHIVE}$" "$TEMP_DIR/SHASUMS256.txt" |
+            (cd "$TEMP_DIR" && sha256sum --check --status)
+        tar -xJf "$TEMP_DIR/$NODE_ARCHIVE" -C /usr/local --strip-components=1
+        export PATH="/usr/local/bin:$PATH"
+        hash -r
+    fi
+else
+    if ! command -v node >/dev/null 2>&1 ||
+        ! node -e 'process.exit([22, 24, 26].includes(Number(process.versions.node.split(".")[0])) ? 0 : 1)' ||
+        ! command -v npm >/dev/null 2>&1; then
+        echo "Installing Node.js 26 LTS"
+        curl --fail --location --show-error \
+            -o "$TEMP_DIR/nodesource.sh" https://deb.nodesource.com/setup_26.x
+        bash "$TEMP_DIR/nodesource.sh"
+        apt-get install -y nodejs
+        hash -r
+    fi
+fi
+
+node --version
+npm --version
+node -e 'if (![22, 24, 26].includes(Number(process.versions.node.split(".")[0]))) throw new Error("Node.js 22, 24 or 26 LTS is required")'
 
 echo "Installing NodeJSAzureDynamicDNS"
-
-install (){
-  if [-d "$INSTALL_DIR"]; then
-    echo "NodeJSAzureDynamicDNS already installed!"
-    exit 1
-  else
-    echo "Installing unzip"
-    apt-get update && sudo apt-get install unzip -y > /dev/null 2>&1
-    echo "Downloading NodeJSAzureDynamicDNS"
-    wget -Nnv https://github.com/Welasco/NodeJSAzureDynamicDNS/archive/master.zip -O NodeJSAzureDynamicDNS.zip
-    unzip NodeJSAzureDynamicDNS.zip -d /opt > /dev/null 2>&1
-    mv /opt/NodeJSAzureDynamicDNS-master/ $INSTALL_DIR
-    chmod +755 $INSTALL_DIR/UpdateAzureRMDDNS.js
-    cd $INSTALL_DIR
-    echo "Installing NPM Modules"
-    npm install > /dev/null 2>&1
-    cp $INSTALL_DIR/UpdateAzureRMDDNS.service /lib/systemd/system
-    systemctl daemon-reload
-    systemctl enable UpdateAzureRMDDNS
-    echo " "
-    echo "NodeJSAzureDynamicDNS Installed at $INSTALL_DIR."
-    echo "You must setup the $INSTALL_DIR/config.json using your settings!"
-    echo "Start the service after: sudo systemctl start UpdateAzureRMDDNS"
-  fi
-}
-
-# Checking if Node.JS is installed
-# Install Node.JS
-if ! [ -x "$(command -v node)" ]; then
-  if $(uname -m | grep -Eq ^armv6); then
-    echo "ARMV6 detected installing node-v11.1.0-linux-armv6l.tar.gz"
-    # reference: https://blog.rodrigograca.com/how-to-install-latest-nodejs-on-raspberry-pi-0-w/
-    # https://unofficial-builds.nodejs.org/download/release/v14.15.2/node-v14.15.2-linux-armv6l.tar.xz
-    curl -o node-v14.15.2-linux-armv6l.tar.xz https://unofficial-builds.nodejs.org/download/release/v14.15.2/node-v14.15.2-linux-armv6l.tar.xz
-    tar -xzf node-v14.15.2-linux-armv6l.tar.xz
-    sudo cp -r node-v14.15.2-linux-armv6l/* /usr/local/
-
-  else
-    echo "NodeJS Not found"
-    echo "Installing NodeJS"
-    curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
-    sudo apt-get install -y nodejs  
-  fi
-  install
-  
-else
-  echo "NodeJS already installed"
-  install
+curl --fail --location --show-error \
+    -o "$TEMP_DIR/app.zip" \
+    https://github.com/Welasco/NodeJSAzureDynamicDNS/archive/master.zip
+unzip -q "$TEMP_DIR/app.zip" -d "$TEMP_DIR"
+mv "$TEMP_DIR/NodeJSAzureDynamicDNS-master" "$INSTALL_DIR"
+cd "$INSTALL_DIR"
+cp config-template.json config.json
+chmod 600 config.json
+npm ci --omit=dev --no-fund
+if [[ ! -e "$ENV_FILE" ]]; then
+    install -m 600 /dev/null "$ENV_FILE"
 fi
+chmod 600 "$ENV_FILE"
+install -m 644 UpdateAzureRMDDNS.service /etc/systemd/system/UpdateAzureRMDDNS.service
+systemctl daemon-reload
+systemctl enable UpdateAzureRMDDNS
 
+echo "Installed at $INSTALL_DIR."
+echo "Configure $INSTALL_DIR/config.json and $ENV_FILE before starting."
+echo "Start with: sudo systemctl start UpdateAzureRMDDNS"

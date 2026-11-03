@@ -1,15 +1,11 @@
 //https://thisdavej.com/using-winston-a-versatile-logging-library-for-node-js/
 'use strict';
 const { createLogger, format, transports } = require('winston');
-const fs = require('fs');
 const path = require('path');
 const filename = path.join(__dirname, 'UpdateAzureRMDDNS.log');
 
-try { fs.unlinkSync(filename); }
-catch (ex) { }
-
 const logconsole = createLogger({
-  level: 'debug',
+  level: 'info',
   format: format.combine(
     format.colorize(),
     format.timestamp({
@@ -23,7 +19,7 @@ const logconsole = createLogger({
 });
 
 const logfile = createLogger({
-    level: 'debug',
+    level: 'info',
     format: format.combine(
       format.timestamp({
         format: 'YYYY-MM-DD HH:mm:ss'
@@ -31,7 +27,7 @@ const logfile = createLogger({
       format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
     ),
     transports: [
-        new transports.File({ filename })
+        new transports.File({ filename, maxsize: 5 * 1024 * 1024, maxFiles: 3 })
       ]
   });
 
@@ -51,8 +47,8 @@ function error(msg) {
 }
 
 function warning(msg) {
-    logconsole.warning(msg);
-    logfile.warning(msg);
+    logconsole.warn(msg);
+    logfile.warn(msg);
 }
 
 module.exports.info = info;

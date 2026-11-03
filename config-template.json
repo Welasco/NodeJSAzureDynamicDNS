@@ -1,17 +1,9 @@
 {
   "updateinterval": 15,
   "CheckPublicIPProviders": [
-    "http://ifconfig.co",
-    "http://checkip.amazonaws.com/",
-    "http://ipecho.net/plain",
-    "http://icanhazip.com",
-    "http://bot.whatismyipaddress.com",
-    "http://ipinfo.io/ip",
-    "http://api.ipify.org",
-    "http://ipinfo.io/ip",
-    "http://wtfismyip.com/text",
-    "http://ipv4.icanhazip.com/",
-    "http://ifconfig.me"
+    "https://api4.ipify.org",
+    "https://ipv4.icanhazip.com/",
+    "https://checkip.amazonaws.com/"
   ],
   "PublicIPAddress": "",
   "AzureAccountDetails": {
@@ -20,22 +12,7 @@
     "AzureDNSZone": "company.com",
     "AzureDNSRecord": "www"
   },
-  "ServicePrincipal": {
-    "authorityHostUrl": "https://login.windows.net",
-    "tenant": "company.onmicrosoft.com",
-    "applicationId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-    "clientSecret": "password",
-    "resource": "https://management.core.windows.net/",
-    "AzureARMAPIURI": "management.azure.com",
-    "token": {
-      "tokenType": "",
-      "expiresIn": 0,
-      "expiresOn": "2000-11-10T17:58:58.402Z",
-      "resource": "",
-      "accessToken": "",
-      "isMRRT": true,
-      "_clientId": "",
-      "_authority": ""
-    }
+  "Authentication": {
+    "method": "clientSecret"
   }
 }

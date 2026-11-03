@@ -1,27 +1,22 @@
-var properties = {
-    "metadata": {
-      "key1": "value1"
-    },
-    "TTL": 3600,
-    "ARecords": [
-      {
-        "ipv4Address": "127.0.0.2"
-      }
-    ]
-};
+'use strict';
 
-var ARecord = {
-  "properties": {
-      "metadata": {
-        "key1": "value1"
-      },
-      "TTL": 3600,
-      "ARecords": [
+const { REQUEST_TIMEOUT_MS } = require('./http-request');
+
+async function updateDNSRecord(client, account, address) {
+    return client.recordSets.createOrUpdate(
+        account.AzureResourceGroup,
+        account.AzureDNSZone,
+        account.AzureDNSRecord,
+        'A',
         {
-          "ipv4Address": "127.0.0.2"
+            ttl: 3600,
+            aRecords: [{ ipv4Address: address }]
+        },
+        {
+            abortSignal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+            requestOptions: { timeout: REQUEST_TIMEOUT_MS }
         }
-      ]
-    }
-};
+    );
+}
 
-module.exports.properties = properties;
+module.exports = { updateDNSRecord };

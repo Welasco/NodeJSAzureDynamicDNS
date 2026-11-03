@@ -2,15 +2,17 @@
   "name": "updateazurermddns",
   "version": "0.0.0",
   "private": true,
+  "engines": {
+    "node": "^22.0.0 || ^24.0.0 || ^26.0.0"
+  },
   "scripts": {
-    "start": "node UpdateAzureRMDDNS.js"
+    "start": "node UpdateAzureRMDDNS.js",
+    "test": "node --test test/*.test.js"
   },
   "dependencies": {
-    "nconf": "^0.10.0",
-    "os": "^0.1.1",
-    "adal-node": "^0.1.28",
-    "winston": "^3.1.0",
-    "is-ip": "^2.0.0",
-    "sync-request": "^6.0.0"
+    "@azure/arm-dns": "^5.1.0",
+    "@azure/identity": "^4.14.1",
+    "nconf": "^0.13.0",
+    "winston": "^3.19.0"
   }
 }
