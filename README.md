@@ -39,7 +39,9 @@ export AZURE_CLIENT_SECRET="your-secret-value"
 npm start
 ```
 
-For systemd, put these assignments in `/etc/NodeJSAzureDynamicDNS.env` (no `export`):
+The installer populates `/etc/NodeJSAzureDynamicDNS.env` with the sample below
+when the file is missing or empty, and preserves existing nonempty files.
+Replace the sample values with your credentials (no `export`):
 
 ```ini
 AZURE_TENANT_ID=your-tenant-id

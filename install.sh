@@ -69,8 +69,15 @@ cd "$INSTALL_DIR"
 cp config-template.json config.json
 chmod 600 config.json
 npm ci --omit=dev --no-fund
-if [[ ! -e "$ENV_FILE" ]]; then
+if [[ ! -s "$ENV_FILE" ]]; then
     install -m 600 /dev/null "$ENV_FILE"
+    cat > "$ENV_FILE" <<'EOF'
+# Replace these sample values with your Azure service principal credentials before starting.
+# systemd loads this file; do not add "export" before the assignments.
+AZURE_TENANT_ID=your-tenant-id
+AZURE_CLIENT_ID=your-application-id
+AZURE_CLIENT_SECRET='your-client-secret-value'
+EOF
 fi
 chmod 600 "$ENV_FILE"
 install -m 644 UpdateAzureRMDDNS.service /etc/systemd/system/UpdateAzureRMDDNS.service

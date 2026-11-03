@@ -57,9 +57,12 @@ unzip() {
 systemctl() { record "systemctl $*"; }
 `;
 
-function runInstaller(t, arch, version, failure = '') {
+function runInstaller(t, arch, version, failure = '', environmentContents) {
     const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'azure-ddns-installer-'));
     t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+    if (environmentContents !== undefined) {
+        fs.writeFileSync(path.join(directory, 'credentials.env'), environmentContents, { mode: 0o644 });
+    }
     const script = fs.readFileSync(path.join(__dirname, '../install.sh'), 'utf8')
         .replace('if [[ $EUID -ne 0 ]]; then', 'if false; then')
         .replaceAll('/opt/NodeJSAzureDynamicDNS', path.join(directory, 'app'))
@@ -91,9 +94,26 @@ test('upgrades old ARMv6 Node to the exact pinned build with XZ extraction and c
     assert.match(result.commands, /tar -xJf .*node-v22.23.4-linux-armv6l.tar.xz -C .* --strip-components=1/);
     assert.match(result.commands, /npm ci --omit=dev/);
     assert.ok(!result.commands.includes('nodesource'));
+    const environment = fs.readFileSync(path.join(result.directory, 'credentials.env'), 'utf8');
+    assert.match(environment, /^AZURE_TENANT_ID=your-tenant-id$/m);
+    assert.match(environment, /^AZURE_CLIENT_ID=your-application-id$/m);
+    assert.match(environment, /^AZURE_CLIENT_SECRET='your-client-secret-value'$/m);
     assert.equal(fs.statSync(path.join(result.directory, 'credentials.env')).mode & 0o777, 0o600);
     assert.equal(fs.statSync(path.join(result.directory, 'app/config.json')).mode & 0o777, 0o600);
     assert.ok(!result.commands.includes('systemctl start'));
+});
+
+test('populates an existing empty environment file without overwriting configured credentials', t => {
+    const empty = runInstaller(t, 'armv6l', 'v22.23.4', '', '');
+    assert.equal(empty.status, 0, empty.stderr);
+    assert.match(fs.readFileSync(path.join(empty.directory, 'credentials.env'), 'utf8'), /^AZURE_TENANT_ID=your-tenant-id$/m);
+    assert.equal(fs.statSync(path.join(empty.directory, 'credentials.env')).mode & 0o777, 0o600);
+
+    const contents = 'AZURE_TENANT_ID=existing-test-tenant\nAZURE_CLIENT_ID=existing-test-client\nAZURE_CLIENT_SECRET="existing-test-secret"\n';
+    const configured = runInstaller(t, 'armv6l', 'v22.23.4', '', contents);
+    assert.equal(configured.status, 0, configured.stderr);
+    assert.equal(fs.readFileSync(path.join(configured.directory, 'credentials.env'), 'utf8'), contents);
+    assert.equal(fs.statSync(path.join(configured.directory, 'credentials.env')).mode & 0o777, 0o600);
 });
 
 test('preserves the requested ARMv6 build if it is already installed', t => {
